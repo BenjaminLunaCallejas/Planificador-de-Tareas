@@ -19,20 +19,20 @@
 </head>
 <body class="p-4 md:p-8 h-screen flex flex-col">
     <div class="max-w-7xl mx-auto w-full flex-grow flex flex-col">
-        <header class="mb-6 flex justify-between items-end border-b border-slate-700 pb-4 shrink-0">
+        <header class="mb-4 flex flex-col md:flex-row justify-between items-start md:items-end border-b border-slate-700 pb-4 shrink-0 gap-4">
             <div>
                 <h1 class="text-3xl font-bold text-sky-400">Task Prioritizer & Planner</h1>
-                <p class="text-slate-400 text-sm mt-1">Algoritmo (I+U-C) + Timeboxing + Deadlines</p>
+                <p class="text-slate-400 text-sm mt-1">Timeline Dinámico | Timeboxing | Priorización (I+U-C)</p>
             </div>
             <button onclick="toggleCompletedModal()" class="text-sm bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg transition text-slate-200 shadow-md">
-                Ver Completadas
+                Ver Historial (Completadas)
             </button>
         </header>
 
         <div class="flex flex-col lg:flex-row gap-6 flex-grow overflow-hidden">
             <aside class="w-full lg:w-1/3 bg-slate-800 p-6 rounded-xl shadow-xl overflow-y-auto shrink-0 h-fit border border-slate-700">
-                <h2 class="text-lg font-semibold mb-4 text-white border-l-4 border-sky-500 pl-2">Captura Dinámica</h2>
-                <div class="space-y-5">
+                <h2 class="text-lg font-semibold mb-4 text-white border-l-4 border-sky-500 pl-2">Nueva Tarea</h2>
+                <div class="space-y-4">
                     
                     <div>
                         <input type="text" id="taskTitle" placeholder="Ej. Escribir capítulo de Ciudad Genes..." class="w-full p-3 rounded-lg bg-slate-900 border border-slate-700 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none text-sm transition text-white">
@@ -65,8 +65,19 @@
                         </div>
                     </div>
 
+                    <div class="grid grid-cols-2 gap-3 p-3 bg-slate-900/50 rounded border border-slate-700/50">
+                        <div class="flex flex-col">
+                            <label class="mb-1 text-[11px] text-sky-400 font-bold uppercase tracking-wide">Comienza el (Nacimiento)</label>
+                            <input type="date" id="taskStartDate" class="p-2 rounded bg-slate-900 border border-slate-700 outline-none focus:border-sky-500 text-white text-xs" style="color-scheme: dark;">
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="mb-1 text-[11px] text-red-400 font-bold uppercase tracking-wide">Fecha Límite (Deadline)</label>
+                            <input type="date" id="taskDueDate" class="p-2 rounded bg-slate-900 border border-slate-700 outline-none focus:border-sky-500 text-white text-xs" style="color-scheme: dark;">
+                        </div>
+                    </div>
+
                     <div>
-                        <label class="block mb-2 text-xs text-slate-400">Periodo / Días de ejecución</label>
+                        <label class="block mb-2 text-xs text-slate-400">Días para ejecutarla</label>
                         <div class="grid grid-cols-4 gap-2 text-xs" id="daysSelector">
                             <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" value="Lunes" class="accent-sky-500 w-3 h-3"> <span>Lu</span></label>
                             <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" value="Martes" class="accent-sky-500 w-3 h-3"> <span>Ma</span></label>
@@ -80,11 +91,11 @@
 
                     <div class="grid grid-cols-2 gap-3">
                         <div class="flex flex-col">
-                            <label class="mb-1 text-xs text-slate-400">Hora (Opcional)</label>
+                            <label class="mb-1 text-xs text-slate-400">Hora agendada</label>
                             <input type="time" id="taskTime" class="p-2 rounded bg-slate-900 border border-slate-700 outline-none focus:border-sky-500 text-white text-xs" style="color-scheme: dark;">
                         </div>
                         <div class="flex flex-col">
-                            <label class="mb-1 text-xs text-slate-400">Duración (Opcional)</label>
+                            <label class="mb-1 text-xs text-slate-400">Duración estimada</label>
                             <select id="taskDuration" class="p-2 rounded bg-slate-900 border border-slate-700 outline-none focus:border-sky-500 text-white text-xs">
                                 <option value="0">Sin estimar</option>
                                 <option value="15">15 min</option>
@@ -98,27 +109,42 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-3 items-end">
-                        <div class="flex flex-col">
-                            <label class="mb-1 text-xs text-slate-400">Fecha límite (Opcional)</label>
-                            <input type="date" id="taskDueDate" class="p-2 rounded bg-slate-900 border border-slate-700 outline-none focus:border-sky-500 text-white text-xs" style="color-scheme: dark;">
-                        </div>
-                        <div class="pb-0.5">
-                            <label class="flex justify-center items-center space-x-2 text-xs cursor-pointer bg-slate-900 p-2 rounded border border-slate-700 w-full h-[34px]">
-                                <input type="checkbox" id="isRecurring" class="accent-sky-500 w-3 h-3">
-                                <span class="text-slate-300">Recurrente</span>
-                            </label>
-                        </div>
+                    <div class="pb-0.5">
+                        <label class="flex justify-center items-center space-x-2 text-sm cursor-pointer bg-slate-900 p-2.5 rounded border border-slate-700 w-full mt-2 hover:bg-slate-800 transition">
+                            <input type="checkbox" id="isRecurring" class="accent-sky-500 w-4 h-4">
+                            <span class="text-slate-300 font-medium">Hacerla Recurrente (Semanal)</span>
+                        </label>
                     </div>
 
                     <button onclick="addTask()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-sky-500/20 mt-2">
-                        Añadir y Jerarquizar
+                        Programar y Jerarquizar
                     </button>
                 </div>
             </aside>
 
-            <main class="w-full lg:w-2/3 bg-slate-900/50 rounded-xl flex overflow-x-auto gap-4 p-2 pb-6 h-full items-start border border-slate-800 shadow-inner" id="kanbanBoard">
-                </main>
+            <div class="w-full lg:w-2/3 flex flex-col h-full overflow-hidden">
+                
+                <div class="flex justify-between items-center mb-4 bg-slate-800 p-3 rounded-xl border border-slate-700 shadow-md shrink-0">
+                    <button onclick="changeWeek(-7)" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm text-white font-medium transition flex items-center space-x-1">
+                        <span>←</span> <span class="hidden sm:inline">Anterior</span>
+                    </button>
+                    
+                    <h3 id="weekLabel" class="text-white font-bold text-sm md:text-base tracking-wide text-center">
+                        </h3>
+                    
+                    <div class="flex space-x-2">
+                        <button onclick="changeWeek(0, true)" class="px-3 py-1.5 bg-sky-600/20 text-sky-400 border border-sky-800/50 hover:bg-sky-600 hover:text-white rounded-lg text-sm font-medium transition">
+                            Hoy
+                        </button>
+                        <button onclick="changeWeek(7)" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm text-white font-medium transition flex items-center space-x-1">
+                            <span class="hidden sm:inline">Siguiente</span> <span>→</span>
+                        </button>
+                    </div>
+                </div>
+
+                <main class="w-full bg-slate-900/50 rounded-xl flex overflow-x-auto gap-4 p-2 pb-6 h-full items-start border border-slate-800 shadow-inner" id="kanbanBoard">
+                    </main>
+            </div>
         </div>
     </div>
 
@@ -128,8 +154,7 @@
                 <h2 class="text-xl font-bold text-emerald-400">Historial de Completadas</h2>
                 <button onclick="toggleCompletedModal()" class="text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
             </div>
-            <div id="completedList" class="overflow-y-auto space-y-2 flex-grow pr-2">
-                </div>
+            <div id="completedList" class="overflow-y-auto space-y-2 flex-grow pr-2"></div>
             <button onclick="clearCompleted()" class="mt-4 w-full bg-red-600/20 hover:bg-red-600/40 text-red-400 py-2.5 rounded-lg transition text-sm font-semibold border border-red-900/50">
                 Limpiar Historial
             </button>
@@ -137,8 +162,54 @@
     </div>
 
     <script>
+        // Utilidades de Fechas para evitar problemas de Zona Horaria
+        function toLocalISO(date) {
+            const z = n => ('0' + n).slice(-2);
+            return `${date.getFullYear()}-${z(date.getMonth()+1)}-${z(date.getDate())}`;
+        }
+
+        function parseLocal(dateString) {
+            if(!dateString) return new Date();
+            const [y, m, d] = dateString.split('-');
+            return new Date(y, m-1, d);
+        }
+
+        function getMonday(d) {
+            d = new Date(d);
+            d.setHours(0,0,0,0);
+            let day = d.getDay();
+            let diff = d.getDate() - day + (day == 0 ? -6 : 1); // Ajusta para que empiece en Lunes
+            return new Date(d.setDate(diff));
+        }
+
+        const dayMap = {"Lunes": 1, "Martes": 2, "Miércoles": 3, "Jueves": 4, "Viernes": 5, "Sábado": 6, "Domingo": 0};
+
+        function getNextDayOfWeek(startDateStr, targetDayName) {
+            let d = parseLocal(startDateStr);
+            let targetDayInt = dayMap[targetDayName];
+            let currentDay = d.getDay();
+            let distance = targetDayInt - currentDay;
+            if (distance < 0) distance += 7;
+            d.setDate(d.getDate() + distance);
+            return toLocalISO(d);
+        }
+
+        // Estado Global
         let tasks = JSON.parse(localStorage.getItem('priorityTasksPro')) || [];
+        let currentWeekStart = getMonday(new Date()); // Arranca siempre mostrando la semana actual
         const weekDays = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+
+        // Migración automática para tareas viejas guardadas en localStorage
+        tasks = tasks.map(t => {
+            if (!t.startDate) t.startDate = toLocalISO(new Date());
+            if (!t.exactDates && !t.isRecurring) {
+                t.exactDates = t.days.map(dName => getNextDayOfWeek(t.startDate, dName));
+            }
+            return t;
+        });
+
+        // Autocompletar la fecha de inicio con el día de hoy por defecto en el HTML
+        document.getElementById('taskStartDate').value = toLocalISO(new Date());
 
         function addTask() {
             const title = document.getElementById('taskTitle').value.trim();
@@ -148,13 +219,22 @@
             const isRecurring = document.getElementById('isRecurring').checked;
             const time = document.getElementById('taskTime').value; 
             const duration = parseInt(document.getElementById('taskDuration').value); 
-            const dueDate = document.getElementById('taskDueDate').value; // Captura la fecha límite
+            let startDate = document.getElementById('taskStartDate').value;
+            const dueDate = document.getElementById('taskDueDate').value; 
             
+            if (!startDate) startDate = toLocalISO(new Date());
+
             const checkboxes = document.querySelectorAll('#daysSelector input[type="checkbox"]:checked');
             const selectedDays = Array.from(checkboxes).map(cb => cb.value);
 
             if (!title) return alert("Debes ingresar un título para la tarea.");
             if (selectedDays.length === 0) return alert("Selecciona al menos un día de ejecución.");
+
+            // Si NO es recurrente, calculamos exactamente en qué fechas va a caer la tarea
+            let exactDates = [];
+            if (!isRecurring) {
+                exactDates = selectedDays.map(dayName => getNextDayOfWeek(startDate, dayName));
+            }
 
             const score = (i * 3) + (u * 2) - c;
 
@@ -164,8 +244,10 @@
                 i, u, c, 
                 time, 
                 duration, 
-                dueDate, // Guarda la fecha
+                startDate,
+                dueDate,
                 days: selectedDays, 
+                exactDates, // Las fechas matemáticas donde aparecerá
                 score,
                 isRecurring,
                 completed: false,
@@ -174,11 +256,21 @@
 
             saveAndRender();
             
+            // Limpiar form
             document.getElementById('taskTitle').value = '';
             document.getElementById('taskTime').value = ''; 
             document.getElementById('taskDuration').value = '0'; 
-            document.getElementById('taskDueDate').value = ''; // Resetea la fecha
+            document.getElementById('taskDueDate').value = ''; 
             document.getElementById('taskTitle').focus();
+        }
+
+        function changeWeek(offsetDays, resetToToday = false) {
+            if (resetToToday) {
+                currentWeekStart = getMonday(new Date());
+            } else {
+                currentWeekStart.setDate(currentWeekStart.getDate() + offsetDays);
+            }
+            renderKanban();
         }
 
         function completeTask(id) {
@@ -219,43 +311,75 @@
 
             const todayReal = new Date();
             todayReal.setHours(0, 0, 0, 0);
+            const todayISO = toLocalISO(todayReal);
 
-            weekDays.forEach(day => {
+            // Actualizar el título de la semana actual
+            const endOfWeek = new Date(currentWeekStart);
+            endOfWeek.setDate(endOfWeek.getDate() + 6);
+            
+            const formatStr = { day: 'numeric', month: 'short' };
+            const labelStr = `Semana del ${currentWeekStart.toLocaleDateString('es-ES', formatStr)} al ${endOfWeek.toLocaleDateString('es-ES', formatStr)} ${endOfWeek.getFullYear()}`;
+            document.getElementById('weekLabel').innerText = labelStr;
+
+            for (let index = 0; index < 7; index++) {
+                let colDateObj = new Date(currentWeekStart);
+                colDateObj.setDate(colDateObj.getDate() + index);
+                let colDateISO = toLocalISO(colDateObj);
+                let dayName = weekDays[index];
+
+                // FILTRO DE LÓGICA TEMPORAL (El cerebro de la herramienta)
                 const dayTasks = tasks
-                    .filter(t => t.days.includes(day) && !t.completed)
+                    .filter(t => {
+                        if (t.completed) return false;
+                        
+                        if (t.isRecurring) {
+                            // Aparece si el día seleccionado coincide y si ya pasamos la fecha de inicio
+                            return t.days.includes(dayName) && colDateISO >= t.startDate;
+                        } else {
+                            // Si es única, SOLO aparece en las fechas exactas calculadas
+                            return t.exactDates && t.exactDates.includes(colDateISO);
+                        }
+                    })
                     .sort((a, b) => {
-                        // 1. Prioridad Máxima: Hora fijada (Timeboxing estricto)
+                        // Ordenamiento Maestro
                         if (a.time && b.time) return a.time.localeCompare(b.time);
                         if (a.time && !b.time) return -1;
                         if (!a.time && b.time) return 1;
 
-                        // 2. Deadlines (Fechas de entrega) - El más cercano va primero
                         if (a.dueDate && b.dueDate) return new Date(a.dueDate) - new Date(b.dueDate);
                         if (a.dueDate && !b.dueDate) return -1; 
                         if (!a.dueDate && b.dueDate) return 1;
 
-                        // 3. Algoritmo Maestro (Score)
                         if (b.score !== a.score) return b.score - a.score;
 
-                        // 4. Quick Wins (Duración)
                         const durA = a.duration || 9999; 
                         const durB = b.duration || 9999;
                         return durA - durB;
                     }); 
 
+                // Cálculos de interfaz
+                const isTodayCol = colDateISO === todayISO;
+                const headerBg = isTodayCol ? 'bg-sky-900/50 border-sky-500/50 border-b-2' : 'bg-slate-800 border-b border-slate-700';
+                const headerText = isTodayCol ? 'text-sky-300' : 'text-sky-500';
+                
                 const totalMins = dayTasks.reduce((sum, t) => sum + (t.duration || 0), 0);
                 const hrs = Math.floor(totalMins / 60);
                 const mins = totalMins % 60;
                 const timeString = totalMins > 0 ? `| ⏳ ${hrs > 0 ? hrs + 'h ' : ''}${mins > 0 ? mins + 'm' : ''}` : '';
 
+                // Formatear la fecha del encabezado (Ej: Lunes 18 Abr)
+                const headerDateDisplay = colDateObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+
                 let html = `
-                    <div class="min-w-[280px] w-[280px] bg-slate-800/80 rounded-xl flex flex-col border border-slate-700 h-full shrink-0 shadow-lg">
-                        <div class="p-3 border-b border-slate-700 bg-slate-800 rounded-t-xl sticky top-0 flex justify-between items-center z-10">
+                    <div class="min-w-[280px] w-[280px] bg-slate-800/80 rounded-xl flex flex-col border ${isTodayCol ? 'border-sky-500/30' : 'border-slate-700'} h-full shrink-0 shadow-lg relative overflow-hidden">
+                        ${isTodayCol ? '<div class="absolute top-0 left-0 right-0 h-1 bg-sky-500 z-20"></div>' : ''}
+                        
+                        <div class="p-3 rounded-t-xl sticky top-0 flex justify-between items-center z-10 ${headerBg}">
                             <div>
-                                <h3 class="font-bold text-sky-400">${day}</h3>
+                                <h3 class="font-bold ${headerText}">${dayName} <span class="text-slate-300 font-normal ml-1 text-sm">${headerDateDisplay}</span></h3>
                                 <span class="text-[10px] text-slate-400 font-mono">${timeString}</span>
                             </div>
-                            <span class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded-full font-mono">${dayTasks.length}</span>
+                            <span class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded-full font-mono shadow-inner">${dayTasks.length}</span>
                         </div>
                         <div class="p-3 space-y-3 overflow-y-auto flex-grow">
                 `;
@@ -273,17 +397,16 @@
                         durBadge = `<span class="bg-slate-800 text-indigo-300 px-1.5 py-0.5 rounded text-[10px] ml-1 font-mono border border-slate-700 align-middle whitespace-nowrap">⏳ ${dStr.trim()}</span>`;
                     }
 
-                    // Renderizar etiqueta de Fecha de Entrega inteligente
                     let dateBadge = '';
                     if (t.dueDate) {
-                        const dObj = new Date(t.dueDate + 'T00:00:00'); // Evita desfases horarios
+                        const dObj = parseLocal(t.dueDate); 
                         const dStr = dObj.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
                         
                         let dateColor = 'text-sky-300';
-                        if (dObj < todayReal) dateColor = 'text-red-400 bg-red-900/30 border-red-800'; // Vencido
-                        else if (dObj.getTime() === todayReal.getTime()) dateColor = 'text-yellow-400 bg-yellow-900/30 border-yellow-800'; // Hoy
+                        if (dObj < todayReal) dateColor = 'text-red-400 bg-red-900/30 border-red-800'; 
+                        else if (dObj.getTime() === todayReal.getTime()) dateColor = 'text-yellow-400 bg-yellow-900/30 border-yellow-800'; 
                         
-                        dateBadge = `<span class="bg-slate-800 ${dateColor} px-1.5 py-0.5 rounded text-[10px] ml-1 font-mono border border-slate-700 align-middle whitespace-nowrap">📅 ${dStr}</span>`;
+                        dateBadge = `<span class="bg-slate-800 ${dateColor} px-1.5 py-0.5 rounded text-[10px] ml-1 font-mono border border-slate-700 align-middle whitespace-nowrap">📅 Lim: ${dStr}</span>`;
                     }
 
                     html += `
@@ -312,13 +435,12 @@
 
                 html += `</div></div>`;
                 board.innerHTML += html;
-            });
+            }
         }
 
         function renderCompleted() {
             const list = document.getElementById('completedList');
             list.innerHTML = '';
-            
             const completedTasks = tasks.filter(t => t.completed).sort((a, b) => b.id - a.id);
 
             if(completedTasks.length === 0) {
@@ -332,7 +454,7 @@
                     <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700 flex justify-between items-center opacity-70 hover:opacity-100 transition">
                         <div>
                             <p class="text-sm line-through text-slate-400">${t.title}</p>
-                            <p class="text-[10px] text-slate-500">Agregada: ${t.dateAdded}${timeStr}</p>
+                            <p class="text-[10px] text-slate-500">Agregada/Inicio: ${t.startDate || t.dateAdded}${timeStr}</p>
                         </div>
                         <button onclick="deleteTask(${t.id})" class="text-red-400/50 hover:text-red-400 text-xs p-2 bg-slate-800 rounded-md transition">Eliminar</button>
                     </div>
@@ -340,7 +462,7 @@
             });
         }
 
-        // Renderizado inicial
+        // Init
         renderKanban();
         renderCompleted();
     </script>
