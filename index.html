@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priority Planner Pro - Hub Ciencia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .task-card { transition: transform 0.2s ease, opacity 0.3s; }
+        .task-card:hover { transform: translateY(-3px); }
+        body { background-color: #0f172a; color: #f8fafc; }
+        
+        /* Barra de desplazamiento visible y adaptada al modo oscuro */
+        ::-webkit-scrollbar { height: 12px; width: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; border-radius: 8px; margin: 0px 4px;}
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 8px; border: 2px solid #1e293b;}
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    </style>
+</head>
+<body class="p-4 md:p-8 h-screen flex flex-col">
+    <div class="max-w-7xl mx-auto w-full flex-grow flex flex-col">
+        <header class="mb-6 flex justify-between items-end border-b border-slate-700 pb-4 shrink-0">
+            <div>
+                <h1 class="text-3xl font-bold text-sky-400">Task Prioritizer & Planner</h1>
+                <p class="text-slate-400 text-sm mt-1">Algoritmo (I+U-C) + Timeboxing + Deadlines</p>
+            </div>
+            <button onclick="toggleCompletedModal()" class="text-sm bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg transition text-slate-200 shadow-md">
+                Ver Completadas
+            </button>
+        </header>
+
+        <div class="flex flex-col lg:flex-row gap-6 flex-grow overflow-hidden">
+            <aside class="w-full lg:w-1/3 bg-slate-800 p-6 rounded-xl shadow-xl overflow-y-auto shrink-0 h-fit border border-slate-700">
+                <h2 class="text-lg font-semibold mb-4 text-white border-l-4 border-sky-500 pl-2">Captura Dinámica</h2>
+                <div class="space-y-5">
+                    
+                    <div>
+                        <input type="text" id="taskTitle" placeholder="Ej. Escribir capítulo de Ciudad Genes..." class="w-full p-3 rounded-lg bg-slate-900 border border-slate-700 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none text-sm transition text-white">
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-2 text-xs">
+                        <div class="flex flex-col">
+                            <label class="mb-1 text-slate-400">Importancia</label>
+                            <select id="imp" class="p-2 rounded bg-slate-900 border border-slate-700 outline-none focus:border-sky-500 text-white">
+                                <option value="3">Alta</option>
+                                <option value="2">Media</option>
+                                <option value="1">Baja</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="mb-1 text-slate-400">Urgencia</label>
+                            <select id="urg" class="p-2 rounded bg-slate-900 border border-slate-700 outline-none focus:border-sky-500 text-white">
+                                <option value="3">Inmediata</option>
+                                <option value="2">Pronta</option>
+                                <option value="1">Normal</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="mb-1 text-slate-400">Esfuerzo</label>
+                            <select id="comp" class="p-2 rounded bg-slate-900 border border-slate-700 outline-none focus:border-sky-500 text-white">
+                                <option value="1">Bajo</option>
+                                <option value="2">Medio</option>
+                                <option value="3">Alto</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block mb-2 text-xs text-slate-400">Periodo / Días de ejecución</label>
+                        <div class="grid grid-cols-4 gap-2 text-xs" id="daysSelector">
+                            <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" value="Lunes" class="accent-sky-500 w-3 h-3"> <span>Lu</span></label>
+                            <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" value="Martes" class="accent-sky-500 w-3 h-3"> <span>Ma</span></label>
+                            <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" value="Miércoles" class="accent-sky-500 w-3 h-3"> <span>Mi</span></label>
+                            <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" value="Jueves" class="accent-sky-500 w-3 h-3"> <span>Ju</span></label>
+                            <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" value="Viernes" class="accent-sky-500 w-3 h-3"> <span>Vi</span></label>
+                            <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" value="Sábado" class="accent-sky-500 w-3 h-3"> <span>Sá</span></label>
+                            <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" value="Domingo" class="accent-sky-500 w-3 h-3"> <span>Do</span></label>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="flex flex-col">
+                            <label class="mb-1 text-xs text-slate-400">Hora (Opcional)</label>
+                            <input type="time" id="taskTime" class="p-2 rounded bg-slate-900 border border-slate-700 outline-none focus:border-sky-500 text-white text-xs" style="color-scheme: dark;">
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="mb-1 text-xs text-slate-400">Duración (Opcional)</label>
+                            <select id="taskDuration" class="p-2 rounded bg-slate-900 border border-slate-700 outline-none focus:border-sky-500 text-white text-xs">
+                                <option value="0">Sin estimar</option>
+                                <option value="15">15 min</option>
+                                <option value="30">30 min</option>
+                                <option value="45">45 min</option>
+                                <option value="60">1 hora</option>
+                                <option value="90">1.5 horas</option>
+                                <option value="120">2 horas</option>
+                                <option value="180">+3 horas</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 items-end">
+                        <div class="flex flex-col">
+                            <label class="mb-1 text-xs text-slate-400">Fecha límite (Opcional)</label>
+                            <input type="date" id="taskDueDate" class="p-2 rounded bg-slate-900 border border-slate-700 outline-none focus:border-sky-500 text-white text-xs" style="color-scheme: dark;">
+                        </div>
+                        <div class="pb-0.5">
+                            <label class="flex justify-center items-center space-x-2 text-xs cursor-pointer bg-slate-900 p-2 rounded border border-slate-700 w-full h-[34px]">
+                                <input type="checkbox" id="isRecurring" class="accent-sky-500 w-3 h-3">
+                                <span class="text-slate-300">Recurrente</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button onclick="addTask()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-sky-500/20 mt-2">
+                        Añadir y Jerarquizar
+                    </button>
+                </div>
+            </aside>
+
+            <main class="w-full lg:w-2/3 bg-slate-900/50 rounded-xl flex overflow-x-auto gap-4 p-2 pb-6 h-full items-start border border-slate-800 shadow-inner" id="kanbanBoard">
+                </main>
+        </div>
+    </div>
+
+    <div id="completedModal" class="fixed inset-0 bg-black/70 hidden flex justify-center items-center backdrop-blur-sm z-50 p-4 transition-opacity">
+        <div class="bg-slate-800 p-6 rounded-xl w-full max-w-2xl max-h-[80vh] flex flex-col border border-slate-600 shadow-2xl">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-2">
+                <h2 class="text-xl font-bold text-emerald-400">Historial de Completadas</h2>
+                <button onclick="toggleCompletedModal()" class="text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+            </div>
+            <div id="completedList" class="overflow-y-auto space-y-2 flex-grow pr-2">
+                </div>
+            <button onclick="clearCompleted()" class="mt-4 w-full bg-red-600/20 hover:bg-red-600/40 text-red-400 py-2.5 rounded-lg transition text-sm font-semibold border border-red-900/50">
+                Limpiar Historial
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let tasks = JSON.parse(localStorage.getItem('priorityTasksPro')) || [];
+        const weekDays = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+
+        function addTask() {
+            const title = document.getElementById('taskTitle').value.trim();
+            const i = parseInt(document.getElementById('imp').value);
+            const u = parseInt(document.getElementById('urg').value);
+            const c = parseInt(document.getElementById('comp').value);
+            const isRecurring = document.getElementById('isRecurring').checked;
+            const time = document.getElementById('taskTime').value; 
+            const duration = parseInt(document.getElementById('taskDuration').value); 
+            const dueDate = document.getElementById('taskDueDate').value; // Captura la fecha límite
+            
+            const checkboxes = document.querySelectorAll('#daysSelector input[type="checkbox"]:checked');
+            const selectedDays = Array.from(checkboxes).map(cb => cb.value);
+
+            if (!title) return alert("Debes ingresar un título para la tarea.");
+            if (selectedDays.length === 0) return alert("Selecciona al menos un día de ejecución.");
+
+            const score = (i * 3) + (u * 2) - c;
+
+            tasks.push({ 
+                id: Date.now(), 
+                title, 
+                i, u, c, 
+                time, 
+                duration, 
+                dueDate, // Guarda la fecha
+                days: selectedDays, 
+                score,
+                isRecurring,
+                completed: false,
+                dateAdded: new Date().toLocaleDateString()
+            });
+
+            saveAndRender();
+            
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskTime').value = ''; 
+            document.getElementById('taskDuration').value = '0'; 
+            document.getElementById('taskDueDate').value = ''; // Resetea la fecha
+            document.getElementById('taskTitle').focus();
+        }
+
+        function completeTask(id) {
+            const taskIndex = tasks.findIndex(t => t.id === id);
+            if (taskIndex > -1) {
+                tasks[taskIndex].completed = true;
+                saveAndRender();
+            }
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveAndRender();
+        }
+
+        function clearCompleted() {
+            if(confirm("¿Seguro que deseas borrar permanentemente el historial de tareas completadas?")) {
+                tasks = tasks.filter(t => !t.completed);
+                saveAndRender();
+                toggleCompletedModal();
+            }
+        }
+
+        function saveAndRender() {
+            localStorage.setItem('priorityTasksPro', JSON.stringify(tasks));
+            renderKanban();
+            renderCompleted();
+        }
+
+        function toggleCompletedModal() {
+            const modal = document.getElementById('completedModal');
+            modal.classList.toggle('hidden');
+        }
+
+        function renderKanban() {
+            const board = document.getElementById('kanbanBoard');
+            board.innerHTML = '';
+
+            const todayReal = new Date();
+            todayReal.setHours(0, 0, 0, 0);
+
+            weekDays.forEach(day => {
+                const dayTasks = tasks
+                    .filter(t => t.days.includes(day) && !t.completed)
+                    .sort((a, b) => {
+                        // 1. Prioridad Máxima: Hora fijada (Timeboxing estricto)
+                        if (a.time && b.time) return a.time.localeCompare(b.time);
+                        if (a.time && !b.time) return -1;
+                        if (!a.time && b.time) return 1;
+
+                        // 2. Deadlines (Fechas de entrega) - El más cercano va primero
+                        if (a.dueDate && b.dueDate) return new Date(a.dueDate) - new Date(b.dueDate);
+                        if (a.dueDate && !b.dueDate) return -1; 
+                        if (!a.dueDate && b.dueDate) return 1;
+
+                        // 3. Algoritmo Maestro (Score)
+                        if (b.score !== a.score) return b.score - a.score;
+
+                        // 4. Quick Wins (Duración)
+                        const durA = a.duration || 9999; 
+                        const durB = b.duration || 9999;
+                        return durA - durB;
+                    }); 
+
+                const totalMins = dayTasks.reduce((sum, t) => sum + (t.duration || 0), 0);
+                const hrs = Math.floor(totalMins / 60);
+                const mins = totalMins % 60;
+                const timeString = totalMins > 0 ? `| ⏳ ${hrs > 0 ? hrs + 'h ' : ''}${mins > 0 ? mins + 'm' : ''}` : '';
+
+                let html = `
+                    <div class="min-w-[280px] w-[280px] bg-slate-800/80 rounded-xl flex flex-col border border-slate-700 h-full shrink-0 shadow-lg">
+                        <div class="p-3 border-b border-slate-700 bg-slate-800 rounded-t-xl sticky top-0 flex justify-between items-center z-10">
+                            <div>
+                                <h3 class="font-bold text-sky-400">${day}</h3>
+                                <span class="text-[10px] text-slate-400 font-mono">${timeString}</span>
+                            </div>
+                            <span class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded-full font-mono">${dayTasks.length}</span>
+                        </div>
+                        <div class="p-3 space-y-3 overflow-y-auto flex-grow">
+                `;
+
+                dayTasks.forEach(t => {
+                    const color = t.score >= 10 ? 'border-l-red-500' : (t.score >= 7 ? 'border-l-yellow-500' : 'border-l-emerald-500');
+                    const recurIcon = t.isRecurring ? `<span title="Recurrente" class="text-sky-400 text-xs ml-1">↻</span>` : '';
+                    const timeBadge = t.time ? `<span class="bg-slate-800 text-sky-300 px-1.5 py-0.5 rounded text-[10px] ml-1 font-mono border border-slate-700 align-middle whitespace-nowrap">🕒 ${t.time}</span>` : '';
+                    
+                    let durBadge = '';
+                    if (t.duration > 0) {
+                        const dHrs = Math.floor(t.duration / 60);
+                        const dMins = t.duration % 60;
+                        const dStr = (dHrs > 0 ? dHrs + 'h ' : '') + (dMins > 0 ? dMins + 'm' : '');
+                        durBadge = `<span class="bg-slate-800 text-indigo-300 px-1.5 py-0.5 rounded text-[10px] ml-1 font-mono border border-slate-700 align-middle whitespace-nowrap">⏳ ${dStr.trim()}</span>`;
+                    }
+
+                    // Renderizar etiqueta de Fecha de Entrega inteligente
+                    let dateBadge = '';
+                    if (t.dueDate) {
+                        const dObj = new Date(t.dueDate + 'T00:00:00'); // Evita desfases horarios
+                        const dStr = dObj.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+                        
+                        let dateColor = 'text-sky-300';
+                        if (dObj < todayReal) dateColor = 'text-red-400 bg-red-900/30 border-red-800'; // Vencido
+                        else if (dObj.getTime() === todayReal.getTime()) dateColor = 'text-yellow-400 bg-yellow-900/30 border-yellow-800'; // Hoy
+                        
+                        dateBadge = `<span class="bg-slate-800 ${dateColor} px-1.5 py-0.5 rounded text-[10px] ml-1 font-mono border border-slate-700 align-middle whitespace-nowrap">📅 ${dStr}</span>`;
+                    }
+
+                    html += `
+                        <div class="task-card bg-slate-900 p-3 rounded-lg border-l-4 ${color} shadow-md relative group">
+                            <div class="flex justify-between items-start mb-2">
+                                <p class="text-sm font-medium leading-snug pr-5 text-slate-100">
+                                    ${t.title} ${recurIcon} ${timeBadge} ${durBadge} ${dateBadge}
+                                </p>
+                                <button onclick="deleteTask(${t.id})" class="text-slate-600 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition absolute top-2 right-2 p-1 bg-slate-800 rounded-md">✕</button>
+                            </div>
+                            
+                            <div class="flex justify-between items-end mt-3 border-t border-slate-800/50 pt-2">
+                                <div class="flex space-x-1.5 text-[10px] text-slate-500 font-mono">
+                                    <span class="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700/50" title="Importancia">I:${t.i}</span>
+                                    <span class="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700/50" title="Urgencia">U:${t.u}</span>
+                                    <span class="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700/50" title="Esfuerzo">C:${t.c}</span>
+                                </div>
+                                
+                                <button onclick="completeTask(${t.id})" class="text-[10px] bg-emerald-900/30 text-emerald-400 border border-emerald-800/50 hover:bg-emerald-600 hover:text-white px-2 py-1 rounded transition font-medium">
+                                    ✓ Listo
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div></div>`;
+                board.innerHTML += html;
+            });
+        }
+
+        function renderCompleted() {
+            const list = document.getElementById('completedList');
+            list.innerHTML = '';
+            
+            const completedTasks = tasks.filter(t => t.completed).sort((a, b) => b.id - a.id);
+
+            if(completedTasks.length === 0) {
+                list.innerHTML = '<p class="text-slate-500 text-sm text-center py-4">No hay tareas completadas aún.</p>';
+                return;
+            }
+
+            completedTasks.forEach(t => {
+                const timeStr = t.time ? ` a las ${t.time}` : '';
+                list.innerHTML += `
+                    <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700 flex justify-between items-center opacity-70 hover:opacity-100 transition">
+                        <div>
+                            <p class="text-sm line-through text-slate-400">${t.title}</p>
+                            <p class="text-[10px] text-slate-500">Agregada: ${t.dateAdded}${timeStr}</p>
+                        </div>
+                        <button onclick="deleteTask(${t.id})" class="text-red-400/50 hover:text-red-400 text-xs p-2 bg-slate-800 rounded-md transition">Eliminar</button>
+                    </div>
+                `;
+            });
+        }
+
+        // Renderizado inicial
+        renderKanban();
+        renderCompleted();
+    </script>
+</body>
+</html>
